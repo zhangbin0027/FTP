@@ -4,7 +4,7 @@ FTP Project in C Based on Linux Platform.
 
 ##一.概述：
 
-![ftp_function](ftp_function.png)
+![ftp_function](images/ftp_function.png)
 
 ####1.简介
 
