@@ -369,8 +369,6 @@ void client_handle(psession_t ps)
 			free(ps);
 			exit(1);
 		}
-		
-		
 		recvn(fd_client, ps->sess_buf, cmd_len);
 		if(strncmp("cd", ps ->sess_buf, 2) == 0)
 		{
