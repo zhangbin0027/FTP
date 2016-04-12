@@ -1,10 +1,10 @@
 #include "ftp.h"
-socket_t socket_server(char* ip, char* port)
+int socket_server(char* ip, char* port)
 {
-	int fd_server ;
+	int sfd ;
 	struct sockaddr_in server_addr ;
-	fd_server = socket(AF_INET, SOCK_STREAM, 0);
-	if(fd_server == -1)
+	sfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(sfd == -1)
 	{
 		return -1;
 	}
@@ -14,41 +14,41 @@ socket_t socket_server(char* ip, char* port)
 	server_addr.sin_addr.s_addr = inet_addr(ip);
 	int reuse = 1 ;
 	int buf_num = BUF_SIZE;
-	if(0 != setsockopt(fd_server, SOL_SOCKET, SO_REUSEADDR,  (void*)&reuse, sizeof(int)) )
+	if(0 != setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR,  (void*)&reuse, sizeof(int)) )
 	{
-		close(fd_server);
+		close(sfd);
 		return -1;
 	}
-	if(0 != setsockopt(fd_server, SOL_SOCKET, SO_SNDBUF,  (void*)&buf_num, sizeof(int)) )
+	if(0 != setsockopt(sfd, SOL_SOCKET, SO_SNDBUF,  (void*)&buf_num, sizeof(int)) )
 	{
-		close(fd_server);
+		close(sfd);
 		return -1 ;	
 	}
-	if(0 != setsockopt(fd_server, SOL_SOCKET, SO_RCVBUF,  (void*)&buf_num, sizeof(int)) )
+	if(0 != setsockopt(sfd, SOL_SOCKET, SO_RCVBUF,  (void*)&buf_num, sizeof(int)) )
 	{
-		close(fd_server);
+		close(sfd);
 		return -1 ;	
 	}
 
-	if(-1 == bind(fd_server, (struct sockaddr*)&server_addr, sizeof(server_addr) ) )
+	if(-1 == bind(sfd, (struct sockaddr*)&server_addr, sizeof(server_addr) ) )
 	{
-		close(fd_server);
+		close(sfd);
 		return -1 ;	
 	}
-	if(-1 == listen(fd_server, 5))
+	if(-1 == listen(sfd, 5))
 	{
-		close(fd_server);
+		close(sfd);
 		return -1 ;
 	}
-	return fd_server ;
+	return sfd ;
 
 }
-socket_t socket_client(char* ip, char* port)
+int socket_client(char* ip, char* port)
 {
-	int fd_client ;
+	int cfd ;
 	struct sockaddr_in server_addr ;
-	fd_client = socket(AF_INET, SOCK_STREAM, 0);
-	if(fd_client == -1)
+	cfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(cfd == -1)
 	{
 		return -1;
 	}
@@ -58,30 +58,30 @@ socket_t socket_client(char* ip, char* port)
 	server_addr.sin_addr.s_addr = inet_addr(ip);
 	int reuse = 1 ;
 	int buf_num = BUF_SIZE;
-	if(0 != setsockopt(fd_client, SOL_SOCKET, SO_REUSEADDR,  (void*)&reuse, sizeof(int)) )
+	if(0 != setsockopt(cfd, SOL_SOCKET, SO_REUSEADDR,  (void*)&reuse, sizeof(int)) )
 	{
-		close(fd_client);
+		close(cfd);
 		return -1;
 	}
-	if(0 != setsockopt(fd_client, SOL_SOCKET, SO_SNDBUF,  (void*)&buf_num, sizeof(int)) )
+	if(0 != setsockopt(cfd, SOL_SOCKET, SO_SNDBUF,  (void*)&buf_num, sizeof(int)) )
 	{
-		close(fd_client);
+		close(cfd);
 		return -1 ;	
 	}
-	if(0 != setsockopt(fd_client, SOL_SOCKET, SO_RCVBUF,  (void*)&buf_num, sizeof(int)) )
+	if(0 != setsockopt(cfd, SOL_SOCKET, SO_RCVBUF,  (void*)&buf_num, sizeof(int)) )
 	{
-		close(fd_client);
+		close(cfd);
 		return -1 ;	
 	}
-	if(-1 == connect(fd_client, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)))
+	if(-1 == connect(cfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)))
 	{
-		close(fd_client);
+		close(cfd);
 		return -1 ;
 	}
-	return fd_client ;
+	return cfd ;
 
 }
-int recvn(socket_t fd_recv,char* recv_buf, int len)
+int recv_n(int fd_recv,char* recv_buf, int len)
 {
 	int sum = 0 ;
 	int nrecv ;
@@ -93,7 +93,7 @@ int recvn(socket_t fd_recv,char* recv_buf, int len)
 	recv_buf[sum] = '\0';
 	return sum ;
 }
-int readn(int fd_read, char* read_buf, int len)
+int read_n(int fd_read, char* read_buf, int len)
 {
 	int sum = 0 ;
 	int nread ;
@@ -110,7 +110,7 @@ int readn(int fd_read, char* read_buf, int len)
 	return sum ;
 		
 }
-int sendn(socket_t fd_send, char* send_buf, int len)
+int send_n(int fd_send, char* send_buf, int len)
 {
 	int sum = 0 ;
 	int nsend ;
@@ -121,7 +121,7 @@ int sendn(socket_t fd_send, char* send_buf, int len)
 	}
 	return sum ;
 }
-int writen(int fd_write, char* write_buf, int len)
+int write_n(int fd_write, char* write_buf, int len)
 {
 	int sum = 0 ;
 	int nwrite ;
@@ -133,7 +133,7 @@ int writen(int fd_write, char* write_buf, int len)
 	return sum ;
 
 }
-void trim_space(char* src)
+void delete_space(char* src)
 {
 	int index, cur ;
 	for(cur = -1, index = 0 ; index < strlen(src); index ++)
@@ -160,7 +160,7 @@ void trim_space(char* src)
 	}
 	src[++cur] = '\0';
 }
-int upload(socket_t fd_up, char* file_name)
+int upload(int fd_up, char* file_name)
 {
 	int fd_file = open(file_name, O_RDONLY);
 	if(fd_file == -1)
@@ -172,17 +172,17 @@ int upload(socket_t fd_up, char* file_name)
 	int nread ;
 	while(1)
 	{
-		nread = readn(fd_file, read_buf, 8192);
+		nread = read_n(fd_file, read_buf, 8192);
 		if(nread < 8192)
 		{
 			send(fd_up, &nread, sizeof(int), 0);
-			sendn(fd_up, read_buf, nread);
+			send_n(fd_up, read_buf, nread);
 			break ;
 		}else
 		{
 			
 			send(fd_up, &nread, sizeof(int), 0);
-			sendn(fd_up, read_buf, nread);
+			send_n(fd_up, read_buf, nread);
 		}
 	}
 	int flag = 0 ;
@@ -190,7 +190,7 @@ int upload(socket_t fd_up, char* file_name)
 	close(fd_file);
 	return 0 ;
 }
-int download(socket_t fd_down, char* file_name)
+int download(int fd_down, char* file_name)
 {
 	int fd_file = open(file_name, O_WRONLY|O_CREAT,0666 );
 	if(fd_file == -1)
@@ -207,24 +207,9 @@ int download(socket_t fd_down, char* file_name)
 		{
 			break ;
 		}
-		recvn(fd_down, write_buf, nwrite);
-		writen(fd_file, write_buf, nwrite);
+		recv_n(fd_down, write_buf, nwrite);
+		write_n(fd_file, write_buf, nwrite);
 	}
 	close(fd_file);
 	return 0 ;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

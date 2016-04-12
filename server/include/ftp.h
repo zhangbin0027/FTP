@@ -14,31 +14,42 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <signal.h>
-#define BUF_SIZE 8*1024
-#define ERR_EXIT(msg) do { \
-						perror(msg);\
-						exit(1);\
-						}while(0)
-typedef struct tag_session
+#define BUF_SIZE 1024
+
+typedef struct information
 {
-	int  sess_sfd ;
-	char sess_buf[BUF_SIZE] ;
+	int  info_sfd ;
+	char info_buf[BUF_SIZE] ;
 
-}session_t, *psession_t ;
+}info_t, *pinfo_t;
 
 
-typedef int socket_t ;
+//初始化从文件读取ip和port
 void ftp_init_from_file(char* path, char* ip, char* port);
-socket_t socket_server(char* ip, char* port);
-void client_handle(psession_t arg);
-int recvn(socket_t fd_recv, char* recv_buf, int len );
-int readn(int fd_read, char* read_buf, int len );
-int sendn(socket_t fd_send, char* send_buf, int len );
-int writen(int fd_write, char* write_buf, int len );
-socket_t socket_client(char* ip, char* port);
-void trim_space(char* src);
-int upload(socket_t fd_up, char* file_name);
-int download(socket_t fd_down, char* file_name);
+
+//服务器初始化函数封装
+int socket_server(char* ip, char* port);
+
+//服务器处理客户端函数
+void client_handle(pinfo_t arg);
+
+//接收，读取，写入，发送函数重写
+int recv_n(int fd_recv, char* recv_buf, int len );
+int read_n(int fd_read, char* read_buf, int len );
+int send_n(int fd_send, char* send_buf, int len );
+int write_n(int fd_write, char* write_buf, int len );
+
+//客户端初始化函数
+int socket_client(char* ip, char* port);
+
+//格式化字符串
+void delete_space(char* src);
+
+//上传函数
+int upload(int fd_up, char* file_name);
+
+//下载函数
+int download(int fd_down, char* file_name);
 #endif
 
 

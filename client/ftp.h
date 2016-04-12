@@ -15,28 +15,21 @@
 #include <sys/stat.h>
 #include <signal.h>
 #define BUF_SIZE 8*1024
-#define ERR_EXIT(msg) do { \
-						perror(msg);\
-						exit(1);\
-						}while(0)
-typedef struct tag_session
-{
-	int  sess_sfd ;
-	char sess_buf[BUF_SIZE] ;
 
-}session_t, *psession_t ;
-typedef int socket_t ;
+
+
+
 void ftp_init_from_file(char* path, char* ip, char* port);
-socket_t socket_server(char* ip, char* port);
-void client_handle(psession_t arg);
-int recvn(socket_t fd_recv, char* recv_buf, int len );
-int readn(int fd_read, char* read_buf, int len );
-int sendn(socket_t fd_send, char* send_buf, int len );
-int writen(int fd_write, char* write_buf, int len );
-socket_t socket_client(char* ip, char* port);
-void trim_space(char* src);
-int upload(socket_t fd_up, char* file_name);
-int download(socket_t fd_down, char* file_name);
+int socket_server(char* ip, char* port);
+
+int recv_n(int fd_recv, char* recv_buf, int len );
+int read_n(int fd_read, char* read_buf, int len );
+int send_n(int fd_send, char* send_buf, int len );
+int write_n(int fd_write, char* write_buf, int len );
+int socket_client(char* ip, char* port);
+void delete_space(char* src);
+int upload(int fd_up, char* file_name);
+int download(int fd_down, char* file_name);
 #endif
 
 
